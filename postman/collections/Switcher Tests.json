@@ -1,0 +1,1125 @@
+{
+	"info": {
+		"_postman_id": "6e8da3a8-855a-43f6-90cb-c543c91e5a24",
+		"name": "Switcher Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "13872782-6e8da3a8-855a-43f6-90cb-c543c91e5a24"
+	},
+	"item": [
+		{
+			"name": "Login as admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let responseJson = pm.response.json();",
+							"const adminToken = responseJson.id_token;",
+							"pm.collectionVariables.set(\"adminToken\", adminToken);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "a4d62024-b157-48e9-a2ed-d9e3fa18b5a8",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"admin_automation\", \"password\": \"admin_automation\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as teacher",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "434b10f6-46f1-432f-a23f-e9543fd3f8e3",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"{{teacheruser}}\", \"password\": \"{{password}}\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "7dc22c74-c396-4f4b-b03b-99d1808cbbbd",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"{{studentuser}}\", \"password\": \"{{password}}\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user invalid - invalid email format",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    let responseJson = pm.response.json();",
+							"  // Проверка, что сообщение об ошибке содержит ожидаемые значения",
+							"    pm.test(\"Response contains fieldErrors\", function () {",
+							"    pm.expect(responseJson.fieldErrors).to.be.an('array').that.is.not.empty;",
+							"",
+							"    // Найти ошибку валидации для поля \"email\"",
+							"    let emailErrors = responseJson.fieldErrors.filter(error => error.field === \"email\");",
+							" ",
+							"    pm.expect(emailErrors).to.have.lengthOf.at.least(1);",
+							"    ",
+							"    // Проверка конкретных сообщений об ошибках для поля \"email\"",
+							"",
+							"    let expectedEmailMessages = [",
+							"        \"size must be between 5 and 254\",",
+							"        \"must be a well-formed email address\"",
+							"    ];",
+							"",
+							"    expectedEmailMessages.forEach(expectedMessage => {",
+							"        let messageFound = emailErrors.some(error => error.message === expectedMessage);",
+							"        pm.expect(messageFound).to.be.true;",
+							"    });",
+							"});",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "b72dfbc0-e10b-4928-8428-43df93bc6a68",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"login\": \"somenewuserMR\", \"email\": \"est\", \"password\": \"fullpassword016\", \"langKey\": \"en\"}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}register",
+					"host": [
+						"{{baseURL}}register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user invalid - empty password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    let responseJson = pm.response.json();",
+							"  // Проверка, что сообщение об ошибке содержит ожидаемые значения",
+							"    pm.test(\"Response contains fieldErrors\", function () {",
+							"    pm.expect(responseJson.fieldErrors).to.be.an('array').that.is.not.empty;",
+							"",
+							"    // Найти ошибку валидации для поля \"email\"",
+							"    let passwordErrors = responseJson.fieldErrors.filter(error => error.field === \"password\");",
+							" ",
+							"    pm.expect(passwordErrors).to.have.lengthOf.at.least(1);",
+							"    ",
+							"    // Проверка конкретных сообщений об ошибках для поля \"email\"",
+							"",
+							"    let expectedPasswordMessages = [",
+							"     \"size must be between 4 and 100\"",
+							"    ];",
+							"",
+							"    expectedPasswordMessages.forEach(expectedMessage => {",
+							"        let messageFound = passwordErrors.some(error => error.message === expectedMessage);",
+							"        pm.expect(messageFound).to.be.true;",
+							"    });",
+							"});",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "3314cd63-06e5-4805-a4d7-4eee2697de4b",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"login\": \"somenewuserMR\", \"email\": \"test@testtt.com\", \"password\": \"\", \"langKey\": \"en\"}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}register",
+					"host": [
+						"{{baseURL}}register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as newly created user (not activated yet)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
+							"    name = pm.variables.get(\"newName\");",
+							"        pm.test(\"Body matches string\", function () {",
+							"            pm.expect(pm.response.text()).to.include(`User ${name} was not activated`);",
+							"        });",
+							"     ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "a3dcd3ef-c733-4a87-a9d4-1f8909fce251",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"{{newName}}\", \"password\": \"troublespass\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with wrong password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {",
+							"    pm.response.to.have.status(401);",
+							"        pm.test(\"Body matches string\", function () {",
+							"            pm.expect(pm.response.text()).to.include(`Bad credentials`);",
+							"        });",
+							"     ",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "ab8da3fd-1a65-4882-b556-e84d3409bb5d",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"ad\", \"password\": \"wrongpass\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with empty login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"    let responseJson = pm.response.json();",
+							"",
+							"",
+							"    // Найти ошибку валидации для поля \"login\"",
+							"    let userNameErrors = responseJson.fieldErrors.filter(error => error.field === \"username\");",
+							"",
+							"    pm.expect(userNameErrors).to.have.lengthOf.at.least(1);",
+							"    ",
+							"    // Проверка конкретных сообщений об ошибках для поля \"login\"",
+							"    let expectedusernameMessages = [",
+							"        \"size must be between 1 and 50\"",
+							"    ];",
+							"    expectedusernameMessages.forEach(expectedMessage => {",
+							"        let messageFound = userNameErrors.some(error => error.message === expectedMessage);",
+							"        pm.expect(messageFound).to.be.true;",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "f2dc84bf-c649-475d-b559-de2bdb5d0e2f",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"username\": \"\", \"password\": \"passwordtesst\", \"rememberMe\": false}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}authenticate",
+					"host": [
+						"{{baseURL}}authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    username = pm.variables.get(\"userName\");",
+							"",
+							"    let responseJson = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"        name = pm.variables.get(\"userName\");",
+							"       pm.test(\"Login is marinke\", function () {",
+							"    pm.expect(responseJson.login).to.eql(`${username}`);",
+							"});",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "0dc64fe8-38ec-4482-ba0c-1ea569939c98",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}admin/users/{{userName}}",
+					"host": [
+						"{{baseURL}}admin"
+					],
+					"path": [
+						"users",
+						"{{userName}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    title = pm.variables.get(\"myTaskTitle\");",
+							"",
+							"    let responseJson = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"        name = pm.variables.get(\"title\");",
+							"       pm.test(`Title is ${title}`, function () {",
+							"    pm.expect(responseJson.title).to.eql(`${title}`);",
+							"});",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "fdae81c0-01a2-44ec-ac92-5339b5e4dd7b",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks/{{myTask}}",
+					"host": [
+						"{{taskURL}}tasks"
+					],
+					"path": [
+						"{{myTask}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0eb61fba-9484-4e20-ab03-24db787f3fd6",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    title = pm.variables.get(\"myTaskTitle\");",
+							"",
+							"    let responseJson = pm.response.json();",
+							"    pm.response.to.have.status(201);",
+							"    const new_task_id = responseJson.id;",
+							"    pm.collectionVariables.set(\"newTaskId\", new_task_id);",
+							"    const new_task_text = responseJson.text;",
+							"    pm.collectionVariables.set(\"newTaskText\", new_task_text);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "2b6da2ef-9a8e-468a-8308-c49752c49375",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\":\"{{$randomAbbreviation}}\",\"answer\":\"{{$randomLoremText}}\",\"title\":\"{{$randomLoremSentence}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks",
+					"host": [
+						"{{taskURL}}tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get newly created task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    task_id = pm.variables.get(\"newTaskId\");",
+							"    let responseJson = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"    pm.test(`Task ID is ${task_id}`, function () {",
+							"    pm.expect(responseJson.id).to.equal(task_id);",
+							"});",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "25a800d3-a6bb-44bc-a428-765b92f8eec4",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":\"57360\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks/{{newTaskId}}",
+					"host": [
+						"{{taskURL}}tasks"
+					],
+					"path": [
+						"{{newTaskId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new task - empty mandatory",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "61fd6fe5-07ac-4a75-8ada-a1f8926bc863",
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "6f6c0496-b7da-4432-bb2d-22fb146978e4",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\":\"\",\"answer\":\"\",\"title\":\"\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks",
+					"host": [
+						"{{taskURL}}tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove existing task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    id = pm.variables.get(\"newTaskId\");",
+							"    pm.response.to.have.status(204);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "d8c76b05-9229-4f9f-8e64-f6c34974ab09",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks/{{newTaskId}}",
+					"host": [
+						"{{taskURL}}tasks"
+					],
+					"path": [
+						"{{newTaskId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verify task doesn't exist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "04bd59a7-6ff7-4e26-86c9-5428af608994",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{taskURL}}tasks/{{newTaskId}}",
+					"host": [
+						"{{taskURL}}tasks"
+					],
+					"path": [
+						"{{newTaskId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add new User Task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fefdc5ab-3b4a-4a7a-aaf3-818f6aae8f78",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {  ",
+							"    userlogin = pm.variables.get(\"userlogin\"); ",
+							"    let responseJson = pm.response.json();",
+							"    pm.response.to.have.status(201);",
+							"    user = responseJson.user.login;",
+							"    pm.test(`Login is ${userlogin}`, function () {",
+							"    pm.expect(user).to.eql(`${userlogin}`);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1f6361ae-9e5b-4e46-9f04-071602a25839",
+						"exec": [
+							"// Generate a timestamp",
+							"let timestamp = new Date().getTime().toPrecision(6);",
+							"",
+							"// Set the timestamp as an environment variable",
+							"pm.environment.set(\"timestamp\", timestamp);",
+							"",
+							"// Optionally, log the timestamp to the console",
+							"console.log(\"Generated timestamp:\", timestamp);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"id": "5e47f121-f2f1-4aa0-9f81-4549b7745f7d",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"isSolved\": true,\n    \"user\": {\n        \"id\": 90601,\n        \"login\": \"marinkarimrim\"\n    },\n    \"task\": {\n        \"id\": 57353,\n        \"text\": \"marinkarimrim task\",\n        \"answer\": \"task for me\",\n        \"title\": \"marinka\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}user-tasks",
+					"host": [
+						"{{baseURL}}user-tasks"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "9f70bfe9-c6d3-4b47-834a-37170554cbc1",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "8e17dd15-7d00-4f75-a03f-08e60dd2d293",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d8c101f1-6f1f-4bea-8e54-f5cfeca7f4ec",
+			"key": "userName",
+			"value": "marinke"
+		},
+		{
+			"id": "d7ecd480-84d1-49af-abd8-5b58a2bcdabf",
+			"key": "newName",
+			"value": "apasnastj"
+		},
+		{
+			"id": "8ef6b469-411e-4e9d-a18b-e1262382ddc6",
+			"key": "baseURL",
+			"value": "https://sqlverifier-live-6e21ca0ed768.herokuapp.com/api/"
+		},
+		{
+			"id": "55f9287f-84a8-433e-8d97-8a7661799515",
+			"key": "adminToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "b8273814-a8b0-44cf-b77c-98eab3096b17",
+			"key": "taskURL",
+			"value": "https://sqlverifier-live-6e21ca0ed768.herokuapp.com/api/",
+			"type": "string"
+		},
+		{
+			"id": "7e40f5a3-da8d-4f2f-bf31-25c6bf60565f",
+			"key": "myTask",
+			"value": "88851"
+		},
+		{
+			"id": "52bf0ea4-870e-4ead-ae6a-ecce3aa036ab",
+			"key": "myTaskTitle",
+			"value": "BABAMARINA",
+			"type": "string"
+		},
+		{
+			"id": "dd58855d-8089-43c8-9432-6eac28cfdb67",
+			"key": "newTaskId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "53604677-09b1-4e33-9c90-f060c2c55310",
+			"key": "newTaskText",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "b3693e9e-8bb7-4aa6-988c-fe2c9bd842bd",
+			"key": "userlogin",
+			"value": "marinkarimrim",
+			"type": "string"
+		},
+		{
+			"id": "6c7c65e8-6ea9-4c62-9faa-16755cc8ad63",
+			"key": "addingTaskText",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "2b4d87f6-b7ac-469a-ae44-e464085ab8b6",
+			"key": "addingTaskAnswer",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"id": "1770577d-d93d-4ae6-af34-6331a3b95f37",
+			"key": "addingTaskTitle",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
